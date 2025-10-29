@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hari Priya — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-1: #050607;
+      --bg-2: #0b0d0f;
+      --glass: rgba(255,255,255,0.03);
+      --neon: #00ff88;
+      --muted: rgba(255,255,255,0.65);
+      --card-blur: 8px;
+    }
+
+    /* Reset */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(0,255,136,0.02), transparent),
+                  linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      color:#e6fff6;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x:hidden;
+      scroll-behavior:smooth;
+    }
+
+    /* Particle canvas occupies background */
+    #bg-canvas{
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+    }
+
+    /* NAV */
+    .navbar{
+      position:fixed; top:0; left:0; right:0; z-index:50;
+      display:flex; justify-content:space-between; align-items:center;
+      padding:18px 48px; gap:16px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.15));
+      border-bottom:1px solid rgba(0,255,136,0.06);
+      backdrop-filter: blur(6px);
+    }
+    .logo{ color:var(--neon); font-weight:800; font-size:1.4rem; letter-spacing:0.4px;}
+    .nav-links{ list-style:none; display:flex; gap:24px; align-items:center; }
+    .nav-links a{
+      color:var(--muted); text-decoration:none; font-weight:600; font-size:0.95rem;
+      padding:8px 10px; border-radius:8px; transition:all .18s ease;
+    }
+    .nav-links a:hover{ color:#ffffff; box-shadow:0 4px 18px rgba(0,255,136,0.06); transform:translateY(-2px);}
+    .nav-links a.active{ color:var(--neon); }
+
+    /* Main container */
+    .container{
+      position:relative; z-index:10;
+      max-width:1100px; margin:120px auto 80px; padding:28px;
+    }
+
+    /* Glass card */
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(0,255,136,0.06);
+      border-radius:16px;
+      padding:36px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      backdrop-filter: blur(var(--card-blur));
+    }
+
+    /* Home / hero */
+    .hero{
+      display:flex; gap:36px; align-items:center; justify-content:center; flex-wrap:wrap;
+      text-align:center;
+    }
+
+    .profile-photo{
+      width:170px; height:170px; border-radius:50%;
+      overflow:hidden; border:3px solid rgba(0,255,136,0.16);
+      box-shadow: 0 0 40px rgba(0,255,136,0.08), 0 6px 20px rgba(0,0,0,0.6);
+      display:flex; align-items:center; justify-content:center;
+      transition:transform .45s cubic-bezier(.2,.9,.2,1);
+      background: radial-gradient(circle at 30% 20%, rgba(0,255,136,0.02), transparent);
+    }
+    .profile-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .profile-photo:hover{ transform:translateY(-6px) rotateY(8deg) scale(1.02); }
+
+    .intro h1{ font-size:2.1rem; margin-bottom:6px; color:#fff; }
+    .intro h1 .name{ color:var(--neon); font-weight:800; letter-spacing:0.3px; }
+    .intro h2{ font-size:1rem; color:var(--muted); font-weight:600; margin-bottom:12px; }
+    .intro p{ color:rgba(230,255,246,0.85); max-width:700px; margin:0 auto 14px; line-height:1.5; }
+
+    .cta-row{ display:flex; gap:14px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+    .btn{
+      background: linear-gradient(90deg, rgba(0,255,136,0.12), rgba(0,255,136,0.06));
+      color:var(--neon); border:1px solid rgba(0,255,136,0.22);
+      padding:10px 18px; border-radius:999px; font-weight:700; text-decoration:none;
+      transition:all .2s ease; font-size:0.95rem;
+    }
+    .btn:hover{ box-shadow:0 14px 40px rgba(0,255,136,0.12); transform:translateY(-4px); }
+
+    /* sections styling */
+    section { margin-top:36px; padding:28px 0; opacity:0; transform:translateY(18px); transition:opacity .7s ease, transform .7s ease; }
+    section.visible{ opacity:1; transform:translateY(0); }
+
+    .section-title{
+      text-align:left; font-size:1.25rem; color:var(--neon); margin-bottom:12px; font-weight:800;
+      display:flex; align-items:center; gap:10px;
+    }
+    .section-sub{ color:var(--muted); margin-bottom:18px; text-align:left; }
+
+    /* Skills grid */
+    .skills-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:14px; }
+    .skill{
+      background: linear-gradient(180deg, rgba(0,0,0,0.25), rgba(255,255,255,0.01));
+      border:1px solid rgba(0,255,136,0.06);
+      padding:14px; border-radius:12px; text-align:center; font-weight:700;
+      transition:transform .25s ease, box-shadow .25s ease;
+    }
+    .skill:hover{ transform:translateY(-6px); box-shadow:0 12px 30px rgba(0,255,136,0.06); }
+
+    /* Projects */
+    .projects-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:18px; margin-top:10px; }
+    .project{
+      padding:18px; border-radius:12px; min-height:120px;
+      background: linear-gradient(180deg, rgba(0,0,0,0.20), rgba(255,255,255,0.01));
+      border:1px solid rgba(0,255,136,0.05);
+      transition:transform .3s ease, box-shadow .3s ease;
+    }
+    .project:hover{ transform:translateY(-8px); box-shadow:0 18px 40px rgba(0,255,136,0.06); }
+    .project h3{ color:var(--neon); margin-bottom:8px; font-size:1.05rem; }
+    .project p{ color:var(--muted); font-size:0.95rem; line-height:1.4; }
+
+    /* contact */
+    .contact-row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+    .email-btn{
+      background:transparent; color:var(--neon); border:1px solid rgba(0,255,136,0.16);
+      padding:10px 14px; border-radius:10px; text-decoration:none; font-weight:700;
+    }
+
+    /* footer small */
+    footer{ text-align:center; color:rgba(230,255,246,0.45); font-size:0.9rem; margin-top:22px; }
+
+    /* responsive */
+    @media (max-width:900px){
+      .navbar{ padding:14px 22px; }
+      .container{ margin:100px 20px; padding:20px; }
+      .intro h1{ font-size:1.7rem; }
+      .profile-photo{ width:140px; height:140px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- background particle canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- NAV -->
+  <header class="navbar">
+    <div class="logo">MyPortfolio</div>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="#home" class="active">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- content container -->
+  <main class="container">
+    <div class="card">
+      <!-- HOME -->
+      <section id="home" class="section">
+        <div class="hero">
+          <div class="profile-photo" aria-hidden="true">
+            <img src="c:\Users\Haripriya\OneDrive\Desktop\haripriyaaa photo.jpg" alt="Hari Priya — Profile Photo" />
+          </div>
+          <div class="intro">
+            <h1>Hi, I'm <span class="name">Haripriya</span></h1>
+            <h2>Building interactive, modern, and user-friendly web solutions</h2>
+            <p>I build efficient, scalable web apps and interactive UIs. Strong in Data Structures & Algorithms (DSA), Python and full-stack development. I enjoy hackathons and practical projects that solve real problems.</p>
+            <div class="cta-row">
+              <a class="btn" href="#projects">Explore My Work</a>
+              <a class="btn" href="#contact">Contact Me</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ABOUT -->
+      <section id="about" class="section">
+        <div class="section-title">About</div>
+        <div class="section-sub">2nd-year Computer Science • Web dev • DSA • Hackathons</div>
+        <p style="color:var(--muted); text-align:left; line-height:1.6;">
+          I’m Haripriya ~ 2nd-year Computer Science student focused on web development, algorithms, and building usable software. I design clean interfaces and write reliable code using HTML, CSS, JavaScript, React, and Python. I solve algorithmic problems regularly and apply efficient data structures to build scalable features.
+        </p>
+      </section>
+
+      <!-- SKILLS -->
+      <section id="skills" class="section">
+        <div class="section-title">Skills</div>
+        <div class="section-sub">Technologies & core strengths</div>
+        <div class="skills-grid">
+          <div class="skill">HTML5</div>
+          <div class="skill">CSS3</div>
+          <div class="skill">JavaScript</div>
+
+          <div class="skill">Python</div>
+          <div class="skill">DSA & Problem Solving</div>
+          <div class="skill">UI / UX Design</div>
+          
+        </div>
+      </section>
+
+      <!-- PROJECTS -->
+      <section id="projects" class="section">
+        <div class="section-title">Projects</div>
+        <div class="section-sub">Selected work — brief & useful</div>
+        <div class="projects-grid">
+          <div class="project">
+            <h3>Study Tracker</h3>
+            <p>Helps students log daily study hours, visualize consistency, and monitor progress to build effective study habits.</p>
+          </div>
+
+          <div class="project">
+            <h4>Upcoming Project</h4>
+            <h3>Fin-Tech Budgeting App</h3>
+            <p>Enables users to manage expenses, track savings, and meet financial goals using smart budgeting insights.</p>
+          </div>
+
+          <div class="project">
+            <h4>Upcoming Project</h4>
+            <h3>Gym Tracking App</h3>
+            <p>Tracks workouts, records progress, and keeps users consistent with personalized routines and analytics.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact" class="section">
+        <div class="section-title">Contact</div>
+        <div class="section-sub">Let’s build something together</div>
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;">
+          <p style="color:var(--muted)">Email: <strong style="color:var(--neon)">hs7408@srmist.edu.in</strong></p>
+          <div class="contact-row">
+            <a class="email-btn" href="mailto:hs7408@srmist.edu.in">Send Email</a>
+            <a class="btn" href="https://github.com/haripriya-0712" target="_blank" rel="noopener">GitHub</a>
+            <a class="btn" href="https://www.linkedin.com/in/haripriya-sudhakar712/" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        © <span id="year"></span> Made By Haripriya
+      </footer>
+    </div>
+  </main>
+
+  <!-- SCRIPTS -->
+  <script>
+    /* -------------------------
+       Intersection fade-in
+       -------------------------*/
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          // update nav active
+          const id = entry.target.getAttribute('id');
+          navLinks.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, {threshold: 0.22});
+
+    sections.forEach(s => obs.observe(s));
+
+    /* -------------------------
+       Smooth nav highlight on click
+       -------------------------*/
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        // close mobile nav logic could go here later
+        navLinks.forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      });
+    });
+
+    /* -------------------------
+       Small Particle Background
+       Simple performant canvas particles
+       -------------------------*/
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = innerWidth;
+    let h = canvas.height = innerHeight;
+    const particles = [];
+    const PARTICLE_COUNT = Math.floor((w*h) / 90000); // scales with screen
+
+    function rand(min, max){ return Math.random()*(max-min)+min; }
+
+    class Particle {
+      constructor(){
+        this.reset();
+      }
+      reset(){
+        this.x = rand(0, w);
+        this.y = rand(0, h);
+        this.vx = rand(-0.2, 0.2);
+        this.vy = rand(-0.2, 0.2);
+        this.r = rand(0.6, 1.8);
+        this.alpha = rand(0.05, 0.25);
+      }
+      update(){
+        this.x += this.vx;
+        this.y += this.vy;
+        if(this.x<0||this.x>w||this.y<0||this.y>h) this.reset();
+      }
+      draw(){
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(0,255,136,' + this.alpha + ')';
+        ctx.fill();
+      }
+    }
+
+    function initParticles(){
+      particles.length = 0;
+      for(let i=0;i<PARTICLE_COUNT;i++) particles.push(new Particle());
+    }
+    initParticles();
+
+    function loop(){
+      ctx.clearRect(0,0,w,h);
+      for(let p of particles){
+        p.update();
+        p.draw();
+      }
+      requestAnimationFrame(loop);
+    }
+    loop();
+
+    addEventListener('resize', () => {
+      w = canvas.width = innerWidth;
+      h = canvas.height = innerHeight;
+      initParticles();
+    });
+
+    /* -------------------------
+       Floating subtle transform for profile (keeps moving)
+       -------------------------*/
+    (function floatPulse(){
+      const el = document.querySelector('.profile-photo');
+      let t = 0;
+      function frame(){
+        t += 0.02;
+        const y = Math.sin(t) * 6;
+        const rz = Math.sin(t*0.6) * 3;
+        el.style.transform = `translateY(${y}px) rotateY(${rz}deg)`;
+        requestAnimationFrame(frame);
+      }
+      frame();
+    })();
+
+    /* -------------------------
+       Year in footer
+       -------------------------*/
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
