@@ -71,23 +71,12 @@
       text-align:center;
     }
 
-    .profile-photo{
-      width:170px; height:170px; border-radius:50%;
-      overflow:hidden; border:3px solid rgba(0,255,136,0.16);
-      box-shadow: 0 0 40px rgba(0,255,136,0.08), 0 6px 20px rgba(0,0,0,0.6);
-      display:flex; align-items:center; justify-content:center;
-      transition:transform .45s cubic-bezier(.2,.9,.2,1);
-      background: radial-gradient(circle at 30% 20%, rgba(0,255,136,0.02), transparent);
-    }
-    .profile-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
-    .profile-photo:hover{ transform:translateY(-6px) rotateY(8deg) scale(1.02); }
-
     .intro h1{ font-size:2.1rem; margin-bottom:6px; color:#fff; }
     .intro h1 .name{ color:var(--neon); font-weight:800; letter-spacing:0.3px; }
     .intro h2{ font-size:1rem; color:var(--muted); font-weight:600; margin-bottom:12px; }
     .intro p{ color:rgba(230,255,246,0.85); max-width:700px; margin:0 auto 14px; line-height:1.5; }
 
-    .cta-row{ display:flex; gap:14px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+    .cta-row{ display:flex; gap:14px; justify_content:center; margin-top:8px; flex-wrap:wrap; }
     .btn{
       background: linear-gradient(90deg, rgba(0,255,136,0.12), rgba(0,255,136,0.06));
       color:var(--neon); border:1px solid rgba(0,255,136,0.22);
@@ -151,7 +140,6 @@
       .navbar{ padding:14px 22px; }
       .container{ margin:100px 20px; padding:20px; }
       .intro h1{ font-size:1.7rem; }
-      .profile-photo{ width:140px; height:140px; }
       .projects-grid{ grid-template-columns:1fr; }
     }
   </style>
@@ -176,9 +164,6 @@
     <div class="card">
       <section id="home" class="section">
         <div class="hero">
-          <div class="profile-photo" aria-hidden="true">
-            <img src="https://avatars.githubusercontent.com/u/196977486?v=4&size=400" alt="Haripriya Sudhakar — Profile Photo" />
-          </div>
           <div class="intro">
             <h1>Hi, I'm <span class="name">Haripriya</span></h1>
             <h2>CSE Student • Web Developer • DSA Enthusiast</h2>
@@ -313,7 +298,7 @@
 
   <script>
     const sections = document.querySelectorAll('.section');
-    const navLinks = document.querySelectorAll('.nav-links a');
+    const navLinks = document.query.querySelectorAll('.nav-links a');
 
     const obs = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -378,19 +363,6 @@
     loop();
 
     addEventListener('resize', () => { w = canvas.width = innerWidth; h = canvas.height = innerHeight; initParticles(); });
-
-    (function floatPulse(){
-      const el = document.querySelector('.profile-photo');
-      let t = 0;
-      function frame(){
-        t += 0.02;
-        const y = Math.sin(t) * 6;
-        const rz = Math.sin(t*0.6) * 3;
-        el.style.transform = `translateY(${y}px) rotateY(${rz}deg)`;
-        requestAnimationFrame(frame);
-      }
-      frame();
-    })();
 
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
